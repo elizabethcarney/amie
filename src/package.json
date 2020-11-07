@@ -1,0 +1,21 @@
+{
+    "name": "tech-together-amie",
+    "version": "2.0.0",
+    "description": "A Slack app to enrich communities.",
+    "main": "tech-together.js",
+    "dependencies": {
+      "botbuilder-adapter-slack": "^1.0.8",
+      "botkit": "^4.6.2",
+      "@google-cloud/secret-manager": "2.1.0"
+    },
+    "devDependencies": {},
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/elizabethcarney/amie.git"
+    },
+    "author": "Google Inc.",
+    "license": "Apache-2.0"
+  }
