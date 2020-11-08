@@ -8,6 +8,7 @@ Built by Elizabeth Carney and Vicky Zhang for TechTogether 2020.
 */
 
 /* setup */
+const cron = require('node-cron');
 const { Botkit, BotkitConversation } = require('botkit')
 const { SlackAdapter, SlackEventMiddleware } = require(
   'botbuilder-adapter-slack')
@@ -42,9 +43,10 @@ var posrxns = ["heart", "orange_heart", "yellow_heart", "green_heart", "blue_hea
 var max_num = 500;
 
 /* goal counts for messages and reactions */
-var goal_msgs = 0;
-var goal_rxns = 0;
-var goal_posrxns = 0;
+//TODO CHANGE BACK
+var goal_msgs = 3;
+var goal_rxns = 2;
+var goal_posrxns = 1;
 
 /* counts for tracking messages and reactions */
 var num_msgs = 0;
@@ -321,8 +323,107 @@ async function botInit() {
         }
     }); 
 
+    // on mondays at 9am EST, send weekly question message
+    cron.schedule('* 8 * * 1', async () => {
+        console.log('Running a Cron job');
 
-    /* FORCE ALL MESSAGES TO SEND FOR TESTING */
+        // decide whether goal was achieved
+        let content = create_question_payload();
+        console.log(content);
+
+        // spawn a bot
+        let bot = await controller.spawn({
+            activity: {
+                conversation: {
+                    team: 'T01DTJ9C3DM',
+                },
+            },
+        });
+        await bot.startConversationInChannel('C01E8AMQALA', 'U01EEH7BHK6');
+        await bot.say(content);
+
+    }, {
+        scheduled: true,
+        timezone: "America/Chicago"
+    });
+
+    // on sundays at 9pm EST, send congrats or try again message
+    cron.schedule('* 20 * * 7', async () => {
+        console.log('Running a Cron job');
+
+        // decide whether goal was achieved
+        let goal_decision = ((num_msgs >= goal_msgs) && (num_rxns >= goal_rxns) && (num_posrxns >= goal_posrxns)) 
+                          ? create_congrats_payload()
+                          : create_fail_payload();
+        console.log(goal_decision);
+
+        // spawn a bot
+        let bot = await controller.spawn({
+            activity: {
+                conversation: {
+                    team: 'T01DTJ9C3DM',
+                },
+            },
+        });
+        await bot.startConversationInChannel('C01E8AMQALA', 'U01EEH7BHK6');
+        await bot.say(goal_decision);
+
+    }, {
+        scheduled: true,
+        timezone: "America/Chicago"
+    });
+
+    // TESTING: send congrats or try again message
+    cron.schedule('47 10 * * *', async () => {
+        console.log('Running a Cron job');
+
+        // decide whether goal was achieved
+        let goal_decision = ((num_msgs >= goal_msgs) && (num_rxns >= goal_rxns) && (num_posrxns >= goal_posrxns)) 
+                          ? create_congrats_payload()
+                          : create_fail_payload();
+        console.log(goal_decision);
+
+        // spawn a bot
+        let bot = await controller.spawn({
+            activity: {
+                conversation: {
+                    team: 'T01DTJ9C3DM',
+                },
+            },
+        });
+        await bot.startConversationInChannel('C01E8AMQALA', 'U01EEH7BHK6');
+        await bot.say(goal_decision);
+
+    }, {
+        scheduled: true,
+        timezone: "America/Chicago"
+    });
+    // TESTING: send question message
+    cron.schedule('47 10 * * *', async () => {
+        console.log('Running a Cron job');
+
+        // decide whether goal was achieved
+        let content = create_question_payload();
+        console.log(content);
+
+        // spawn a bot
+        let bot = await controller.spawn({
+            activity: {
+                conversation: {
+                    team: 'T01DTJ9C3DM',
+                },
+            },
+        });
+        await bot.startConversationInChannel('C01E8AMQALA', 'U01EEH7BHK6');
+        await bot.say(content);
+
+    }, {
+        scheduled: true,
+        timezone: "America/Chicago"
+    });
+
+
+    /* TESTING: FORCE ALL MESSAGES TO SEND */
     // when someone sends a message saying "goal was achieved", send congrats message
     controller.hears('goal was achieved', 'message', async (bot, message) => {
       console.log("Sending congrats");
